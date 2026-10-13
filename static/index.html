@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Academic Advisor</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { margin-top: 18px; padding: 10px 16px; cursor: pointer; }
+    #result { margin-top: 24px; padding: 12px; background: #f2f2f2; border-radius: 6px; display: none; }
+    .note { font-size: 12px; color: #666; margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <h2>Academic Advisor System</h2>
+  <label>Level</label>
+  <select id="level">
+    <option>100L</option><option>200L</option><option selected>300L</option><option>400L</option>
+  </select>
+  <label>Study hours per week</label><input id="study" type="number" value="15">
+  <label>Attendance (%)</label><input id="att" type="number" value="80">
+  <label>Previous GPA (0-5)</label><input id="gpa" type="number" step="0.01" value="3.5">
+  <label>Assignments completed (%)</label><input id="assign" type="number" value="85">
+  <label>Extracurricular hours per week</label><input id="extra" type="number" value="4">
+  <button onclick="predict()">Get Advice</button>
+
+  <div id="result"></div>
+  <p class="note">Educational demo trained on synthetic data. Not an official academic assessment.</p>
+
+  <script>
+    function esc(t) { const d = document.createElement("div"); d.textContent = t; return d.innerHTML; }
+
+    async function predict() {
+      const body = {
+        study_hours_per_week: +document.getElementById("study").value,
+        attendance_pct: +document.getElementById("att").value,
+        previous_gpa: +document.getElementById("gpa").value,
+        assignments_completed_pct: +document.getElementById("assign").value,
+        extracurricular_hours: +document.getElementById("extra").value,
+        level: document.getElementById("level").value
+      };
+      const box = document.getElementById("result");
+      box.style.display = "block";
+      try {
+        const res = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) { box.textContent = "Please check your inputs (error " + res.status + ")."; return; }
+        const data = await res.json();
+        const probs = Object.entries(data.probabilities)
+          .map(([k, v]) => esc(k) + ": " + (v * 100).toFixed(1) + "%").join(" | ");
+        box.innerHTML = "<h3>Status: " + esc(data.status) + "</h3><p>" + probs + "</p><ul>" +
+          data.advice.map(a => "<li>" + esc(a) + "</li>").join("") + "</ul>";
+      } catch (e) {
+        box.textContent = "Could not reach the server.";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "model_name": "Logistic Regression",
+  "trained_on": "2026-10-13",
+  "python_version": "3.13.16",
+  "sklearn_version": "1.6.1",
+  "features": [
+    "study_hours_per_week",
+    "attendance_pct",
+    "previous_gpa",
+    "assignments_completed_pct",
+    "extracurricular_hours",
+    "level"
+  ],
+  "categorical_values": {
+    "level": [
+      "100L",
+      "200L",
+      "300L",
+      "400L"
+    ]
+  },
+  "classes": [
+    "At Risk",
+    "Average",
+    "High Performer"
+  ],
+  "test_accuracy": 0.9075,
+  "accuracy_by_level": {
+    "100L": 0.919,
+    "200L": 0.861,
+    "300L": 0.944,
+    "400L": 0.906
+  },
+  "disclaimer": "Educational demo trained on synthetic data. Not an official academic assessment."
+}
